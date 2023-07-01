@@ -8,7 +8,20 @@
 */
 
 function isAnagram(str1, str2) {
-
+  var count = 0
+  for(i=0;i<str1.length;i++){
+    for(j=0;j<str2.length;j++){
+      if(str1[i]===str2[j]){
+        count+=1;
+        break;
+      }
+    }
+  }
+  if(count===str1.length && count===str2.length){
+    return true
+  }
+  return false
 }
-
+var x = isAnagram("dfatsyase","saedityas")
+console.log(x)
 module.exports = isAnagram;
