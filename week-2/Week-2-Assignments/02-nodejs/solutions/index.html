@@ -5,11 +5,13 @@
 </head>
 <script>
 
-    function deleteDone() {
+    function deleteDone(id) {
         console.log("done delete");
         // Delete the right todo from the list
         // You will need to give each todo an id, and that should be enough to remove it
-
+        var parentElement = document.getElementById("mainArea");
+        var childElement = document.getElementById(id);
+        childElement.parentElement.removeChild(childElement);    
     }
     function deleteTodo(id) {
         fetch("http://localhost:3000/todos/" + id, {
@@ -17,7 +19,7 @@
             headers: {
                 "Content-Type": "application/json"
             }
-        }).then(deleteDone)
+        }).then(deleteDone(id))
     }
 
     function todosCallback(data) {

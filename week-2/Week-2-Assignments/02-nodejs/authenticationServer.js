@@ -21,7 +21,8 @@
   3. GET /data - Fetch all user's names and ids from the server (Protected route)
     Description: Gets details of all users like firstname, lastname and id in an array format. Returned object should have a key called users which contains the list of all users with their email/firstname/lastname.
     The users username and password should be fetched from the headers and checked before the array is returned
-    Response: 200 OK with the protected data in JSON format if the username and password in headers are valid, or 401 Unauthorized if the username and password are missing or invalid.
+    Response: 200 OK with the protected data in JSON format if the username and password in headers are valid, or 401 Unauthorized if the username and password are missing or inval
+    id.
     Example: GET http://localhost:3000/data
 
   - For any other route not defined in the server return 404
@@ -30,8 +31,65 @@
  */
 
 const express = require("express")
-const PORT = 3000;
+const PORT = 3001;
 const app = express();
 // write your logic here, DONT WRITE app.listen(3000) when you're running tests, the tests will automatically start the server
+app.use(express.json());
+var user = [];
+
+app.post('/signup',(req,res)=>{
+  var inputUser = req.body;
+  var userFound = false;
+  for(let i=0 ; i<user.length ; i++) {
+    if(user[i].email === inputUser.email){
+      userFound = true;
+      break;
+    }
+  }
+  if(!userFound){
+    let newUser = inputUser;
+    user.push(newUser);
+    res.status(201).send("Signup Done!");
+  }else{
+    res.status(400).send("User already exists!");
+  }
+});
+
+
+app.post('/login',(req,res)=>{
+  var log = req.body;
+  let userFound = null;
+  for(let i=0 ; i<user.length;i++){
+    if(user[i].email === log.email && user[i].password === log.password){
+      userFound = user[i];
+      break;
+    }    
+  }
+  if(userFound){
+  res.status(200).json({
+    Name: userFound.name,
+    Lastname : userFound.Lastname,
+    Email : userFound.email
+  });
+  }
+  else{
+    res.sendStatus(400);
+  }
+});
+
+app.get('/data' , (req,res)=>{
+  let dataFound = [];
+  let fetchedData = req.headers;
+  for(let i=0 ; i<user.length ; i++){
+    if(user[i].email === fetchedData.email && user[i].password === fetchedData.password){
+      dataFound.push({
+        Name : user[i].name,
+        email: user[i].email
+      });
+    }
+  }
+  res.status(200).json(dataFound);
+});
+app.listen(3000);
 
 module.exports = app;

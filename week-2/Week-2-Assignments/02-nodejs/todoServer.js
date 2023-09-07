@@ -29,7 +29,6 @@
     Response: 200 OK if the todo item was found and updated, or 404 Not Found if not found.
     Example: PUT http://localhost:3000/todos/123
     Request Body: { "title": "Buy groceries", "completed": true }
-    
   5. DELETE /todos/:id - Delete a todo item by ID
     Description: Deletes a todo item identified by its ID.
     Response: 200 OK if the todo item was found and deleted, or 404 Not Found if not found.
@@ -41,9 +40,76 @@
  */
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const cors = require('cors')
 const app = express();
 
-app.use(bodyParser.json());
+app.use(cors());
+app.use(express.json());
 
+let TODOS = [];
+
+app.get('/todos' , (req,res)=>{
+  res.json(TODOS);
+});
+
+app.get('/todos/:id' , (req,res)=>{
+  let id = parseInt(req.params.id);
+  let todo = TODOS.find(a => a.id === id);
+  if(todo){
+    res.status(200).json({Todo : todo });
+  }else{
+    res.status(401).send("Todo not found");
+  }
+});
+
+app.post('/todos',(req,res)=>{
+  const todo_id = TODOS.length+1;
+  const newTodo = {
+    id : todo_id,
+    title : req.body.title,
+    completed : false,
+    description : req.body.description
+  };
+  TODOS.push(newTodo);
+  res.status(200).json({
+    message : "Todo item created successfully",
+    id : todo_id});
+});
+
+app.put('/todos/:id' ,(req,res)=>{
+  const newTodo = req.body;
+  const tid = parseInt(req.body.id);
+  let todoIndex = TODOS.findIndex(a => a.id === tid);
+  if(todoIndex !== -1){
+    TODOS[todoIndex].title=newTodo.title;
+    TODOS[todoIndex].description = newTodo.description;
+    res.json({
+      UpdatedTodo : TODOS[todoIndex],
+      message : "Todo Updated Successfully"
+    });
+  }else{
+    res.status(404).send("Todo not found");
+  }
+});
+
+app.delete('/todos/:id',(req , res) =>{
+  const tid = parseInt(req.params.id);
+  const todo = TODOS.find(a=>a.id === tid);
+  const todoIndex = TODOS.findIndex(a=>a.id === tid);
+  if(todoIndex !== -1){
+    TODOS.splice(todoIndex,1);
+    res.status(200).json({
+      message : "Todo deleted successfully"
+    })
+  }else{
+    res.status(404).send("Todo not found for the id given");
+  }
+}); 
+
+app.use((req,res)=>{
+  res.status(404).send("Route not found")
+});
+app.listen(3000, ()=>{
+  console.log("Server listning on port 3000");
+});
 module.exports = app;

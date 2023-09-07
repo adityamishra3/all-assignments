@@ -1,7 +1,8 @@
 const express = require('express');
+const cors = require('cors')
 const jwt = require('jsonwebtoken');
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 
 let ADMINS = [];
@@ -47,7 +48,7 @@ app.post('/admin/signup', (req, res) => {
 });
 
 app.post('/admin/login', (req, res) => {
-  const { username, password } = req.headers;
+  const { username, password } = req.body;
   const admin = ADMINS.find(a => a.username === username && a.password === password);
 
   if (admin) {
@@ -107,7 +108,7 @@ app.post('/users/login', (req, res) => {
 });
 
 app.get('/users/courses', authenticateJwt, (req, res) => {
-  res.json({ courses: COURSES });
+  res.send(COURSES);
 });
 
 app.post('/users/courses/:courseId', authenticateJwt, (req, res) => {
