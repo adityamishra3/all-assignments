@@ -8,62 +8,61 @@ let ADMINS = [];
 let USERS = [];
 let COURSES = [];
 
-const secret = 'My_Secret_key';
-const generateJwt = (user) => {
-  const payload = {username : user.username}
-  jwt.sign(payload,secret); // here payload is the data that you want to encrypt and secret is your secret key
-};
-
-const authenticateJwt = (req,res,next)=>{
-  let authHeader = req.header.authentication;
-  if(authHeader){
-    const token = authHeader.split(" ")[1];
-    jwt.verify(token,secret,(err,user)=>{
-      if(err){
-        res.status(403);
+const secret = "53CRET";
+const authenticateJwt = (req, res, next) => {
+  let auth = req.headers.authorization;
+  if (auth) {
+    const token = auth.split(' ')[1];  // Extract token from 'Bearer <token>'
+    jwt.verify(token, secret, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);  // Send 403 if token is invalid
       }
-      req.user = user;
-      next();
+      req.user = user;  // Attach user to request object
+      next();  // Proceed to the next middleware/route
     });
-  }else{
-    res.status(401);
-  } 
+  } else {
+    res.sendStatus(401);  // No token was provided
+  }
 };
 
+const generateJwt=(user)=>{
+  const payload = {username : user.username};
+  return jwt.sign(payload,secret,{expiresIn:'1h'});
+}
 // Admin routes
 app.post('/admin/signup', (req, res) => {
   // logic to sign up admin
-  var adminInfo = req.body;
-  let adminFound = ADMINS.find(a=>a.username === adminFound.username);
-  if(!adminFound){
-    ADMINS.push(adminInfo);
-    const token = generateJwt(adminInfo);
-    res.json({
-      message : "Admin Created Successfully",
-      token
-    });
+  let admin = req.headers;
+  let adminExists = ADMINS.find(a => a.username === admin.username);
+  if(adminExists){
+    res.json({message:"Admin already exists"})
+  }else{
+    let token = generateJwt(admin);
+    ADMINS.push(admin);
+    console.log(token);
+    res.json({message:"admin created successfully", token : token});
   }
 });
 
 app.post('/admin/login', (req, res) => {
-  // logic to log in admin
-  const {username , password} = req.header;
+  const { username, password } = req.headers;
   const admin = ADMINS.find(a => a.username === username && a.password === password);
-  if(admin){
+  if (admin) {
     const token = generateJwt(admin);
-    res.json({message : "Logged in Successfully" , token});
-  }else{
+    res.json({ message: "Logged in Successfully", token });
+  } else {
     res.status(401).send("Admin not found");
   }
 });
 
-app.post('/admin/courses',authenticateJwt,(req, res) => {
-  // logic to create a course
-  const Course = req.body;
-  courseId = COURSES.length+1;
-  COURSES.push(Course);
-  res.json({message : "Course Created Successfullt",COurse_ID : courseId});
+
+app.post('/admin/courses', authenticateJwt, (req, res) => {
+  const newCourse = req.body;
+  newCourse.id = COURSES.length + 1;
+  COURSES.push(newCourse);
+  res.json({ message: "Course Created Successfully", courseId: COURSES.length+1});
 });
+
 
 app.put('/admin/courses/:courseId',authenticateJwt, (req, res) => {
   // logic to edit a course
@@ -71,7 +70,7 @@ app.put('/admin/courses/:courseId',authenticateJwt, (req, res) => {
   const courseId = parseInt(req.params.courseId);
   const courseIndex = COURSES.findIndex(a=>a.id === courseId);
   if(courseIndex>-1){
-    COURSES[courseIndex] =  course;
+    COURSES[courseIndex] = course;
     res.status(200).json({message:"Course Updates Successfully"})
   }else{
     res.status(400).send("Course Not Found");

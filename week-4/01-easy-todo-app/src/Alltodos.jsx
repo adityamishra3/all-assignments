@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 function Alltodos(){
     let [todo,setTodo] = useState([]);
 
-    useEffect(()=>{
+    useEffect(()=>{ 
         fetch("http://localhost:3000/todos",{
             method:"GET",
         })  

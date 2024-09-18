@@ -1,0 +1,22 @@
+[
+    {
+        "username": "adi1",
+        "password": "123",
+        "purchasedCourses": [
+            {
+                "title": "course title 2",
+                "description": "course description 2",
+                "price": 100,
+                "imageLink": "linktoimage.com",
+                "id": 1
+            },
+            {
+                "title": "course title 2",
+                "description": "course description 2",
+                "price": 100,
+                "imageLink": "linktoimage.com",
+                "id": 2
+            }
+        ]
+    }
+]

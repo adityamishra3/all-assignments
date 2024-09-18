@@ -1,10 +1,11 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const fs = require('fs');
 const app = express();
 
 app.use(express.json());
-
+app.use(cors());
 let ADMINS = [];
 let USERS = [];
 let COURSES = [];
@@ -56,12 +57,13 @@ app.post('/admin/signup', (req, res) => {
 });
 
 app.post('/admin/login', (req, res) => {
-  const { username, password } = req.headers;
+  const { username, password } = req.body;
   const admin = ADMINS.find(a => a.username === username && a.password === password);
   if (admin) {
     const token = jwt.sign({ username, role: 'admin' }, SECRET, { expiresIn: '1h' });
     res.json({ message: 'Logged in successfully', token });
   } else {
+    console.log(username,password);
     res.status(403).json({ message: 'Invalid username or password' });
   }
 });

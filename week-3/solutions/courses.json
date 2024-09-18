@@ -1,1 +1,12 @@
-[]
+[
+    {
+        "title": "Web Dev",
+        "description": "Mern stack development course",
+        "id": 1
+    },
+    {
+        "title": "new course",
+        "description": "naya course add kar rha hu",
+        "id": 2
+    }
+]
